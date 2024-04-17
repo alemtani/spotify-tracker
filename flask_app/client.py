@@ -1,19 +1,73 @@
 import base64
-import json
 import requests
-import threading
+import json
 import time
+
+class Player(object):
+    def __init__(self, data, detailed=False):
+        self.id = data['id']
+        self.name = data['name']
+        self.type = data['type']
+        self.artists = data['artists']
+
+        if self.type == 'album':
+            self.image = data['images'][0] if data['images'] else None
+            self.release_year = int(data['release_date'][:4])
+        else:
+            self.duration_ms = data['duration_ms']
+            self.album = Player(data['album'])
+        
+        if detailed:
+            self.popularity = data['popularity']
+
+            if self.type == 'album':
+                self.album_type = data['album_type']
+                self.total_tracks = data['total_tracks']
+                self.genres = data['genres']
+
+                # Will calculate these separately
+                self.tracks = []
+                self.duration_ms = 0
+    
+    def load_tracks(self, tracks):
+        if self.type == 'track': # Do nothing in this case
+            return
+        
+        album = {
+            'id': self.id,
+            'name': self.name,
+            'type': 'album',
+            'artists': self.artists,
+            'images': [self.image] if self.image else None,
+            'release_date': str(self.release_year),
+        }
+        
+        for track in tracks:
+            # Need to add current album data
+            track['album'] = album
+            self.tracks.append(Player(track))
+            self.duration_ms += track['duration_ms']
+    
+    def __repr__(self):
+        return json.dumps({
+            'id': self.id,
+            'name': self.name,
+            'type': self.type,
+            'artists': self.artists
+        })
 
 class SpotifyClient(object):
     def __init__(self, client_id, client_secret):
         self.sess = requests.Session()
         self.client_id = client_id
         self.client_secret = client_secret
-        self.refresh_token()
-        # thread = threading.Thread(target=self.refresh_token)
-        # thread.start()
+        self.expires_in = time.time()
     
     def refresh_token(self):
+        now = time.time()
+        if now < self.expires_in:
+            return
+        
         # Source: https://www.youtube.com/watch?v=WAmEZBEeNmg
 
         # Get the base64 auth string
@@ -27,22 +81,61 @@ class SpotifyClient(object):
             'Authorization': f'Basic {auth_base64}',
             'Content-Type': 'application/x-www-form-urlencoded'
         }
-        data = {
-            'grant_type': 'client_credentials'
+        data = { 'grant_type': 'client_credentials' }
+        resp = self.sess.post(url, headers=headers, data=data)
+        data = resp.json()
+        self.access_token = data['access_token']
+        self.expires_in = now + data['expires_in']
+    
+    def get_auth_header(self):
+        self.refresh_token()
+        return { 'Authorization': f'Bearer {self.access_token}' }
+    
+    def get_request(self, url):
+        headers = self.get_auth_header()
+        resp = self.sess.get(url, headers=headers)
+
+        if resp.status_code != 200:
+            raise ValueError(f'Request failed with status code {resp.status_code}')
+        
+        data = resp.json()
+        return data
+    
+    def search_for_item(self, q, item, offset=0):
+        url = f'https://api.spotify.com/v1/search?q={q}&type={item}&offset={offset}'
+        data = self.get_request(url)
+        data = data[f'{item}s']
+
+        result = {
+            'next': offset + data['limit'] \
+                if offset + data['limit'] < offset + data['total'] else None,
+            'prev': offset - data['limit'] \
+                if offset - data['limit'] >= 0 else None,
+            'items': []
         }
 
-        # Update just once for now
-        result = requests.post(url, headers=headers, data=data)
-        result_data = json.loads(result.content)
-        self.access_token = result_data['access_token']
+        for item in data['items']:
+            result['items'].append(Player(item))
 
-        # STRETCH GOAL: Refresh token after the expiry period using a background task
-        # while True:
-        #     result = requests.post(url, headers=headers, data=data)
-        #     result_data = json.loads(result.content)
-        #     self.access_token = result_data['access_token']
-        #     print(f"New access token (expires in {result_data['expires_in']}): {self.access_token}")
-        #     time.sleep(result_data['expires_in'])
+        return result
+    
+    def get_player_by_id(self, item, spotify_id):
+        url = f'https://api.spotify.com/v1/{item}s/{spotify_id}'
+        data = self.get_request(url)
+
+        player = Player(data, detailed=True)
+
+        if item == 'album':
+            url = f'https://api.spotify.com/v1/albums/{spotify_id}/tracks'
+
+            while True:
+                data = self.get_request(url)
+                player.load_tracks(data['items'])
+                if not data['next']:
+                    break
+                url = data['next']
+
+        return player
 
 """ *** Test usage *** """
 if __name__ == '__main__':
@@ -50,3 +143,26 @@ if __name__ == '__main__':
     CLIENT_SECRET = '061d96a2988f4726a2f84ee62690854c'
 
     client = SpotifyClient(CLIENT_ID, CLIENT_SECRET)
+
+    """ Test search functions """
+    
+    # Search for track
+    # result = client.search_for_item('blank space', item='track')
+    # print(result)
+
+    # Search for album
+    # result = client.search_for_item('red', item='album')
+    # print(result)
+
+    """ Test detail functions """
+
+    # Get track detail
+    # result = client.get_player_by_id('track', '1p80LdxRV74UKvL8gnD7ky')
+    # print(result)
+
+    # Get album detail
+    # result = client.get_player_by_id('album', '6kZ42qRrzov54LcAk4onW9')
+    # print(result)
+    # print(result.tracks)
+
+    
