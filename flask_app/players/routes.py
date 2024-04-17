@@ -1,4 +1,4 @@
-from flask import Blueprint
+from flask import Blueprint, render_template
 
 players = Blueprint('players', __name__)
 
@@ -6,7 +6,7 @@ players = Blueprint('players', __name__)
 
 @players.route('/', methods=['GET', 'POST'])
 def index():
-    return 'index'
+    return render_template('index.html')
 
 @players.route('/search', methods=['GET'])
 def search():

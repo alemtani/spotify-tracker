@@ -1,13 +1,7 @@
 from flask import Flask
+from flask_bcrypt import Bcrypt
 from flask_login import LoginManager
-from pymongo.mongo_client import MongoClient
-from pymongo.server_api import ServerApi
-
-# Create a new Mongo client and connect to the database
-uri = 'mongodb+srv://mongodb:mongodb@cluster0.gy12rxn.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0'
-
-mongo_client = MongoClient(uri, server_api=ServerApi('1'))
-db = mongo_client.trackers
+from flask_mongoengine import MongoEngine
 
 # Create a new Spotify client
 from .client import SpotifyClient
@@ -17,7 +11,9 @@ CLIENT_SECRET = '061d96a2988f4726a2f84ee62690854c'
 
 spotify_client = SpotifyClient(CLIENT_ID, CLIENT_SECRET)
 
+bcrypt = Bcrypt()
 login_manager = LoginManager()
+db = MongoEngine()
 
 # Import blueprints
 from .users.routes import users
@@ -31,6 +27,7 @@ def create_app(test_config=None):
         app.config.update(test_config)
     
     login_manager.init_app(app)
+    db.init_app(app)
     
     # Register blueprints
     app.register_blueprint(users)
