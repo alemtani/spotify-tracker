@@ -1,30 +1,9 @@
-{% extends "layout.html" %}
+{% from 'bootstrap5/form.html' import render_form %}
+{% extends "base.html" %}
+
 {% block content %}
+
 <h1 class="mb-3">{{ title }}</h1>
-<form method="POST">
-    {{ form.csrf_token }}
-    <div class="mb-3">
-        {{ form.email.label }}
-        {{ form.email(class="form-control") }}
-        {% if form.email.errors %}
-            {% for error in form.email.errors %}
-            <div class="alert alert-danger mt-2" role="alert">
-                {{ error }}
-            </div>
-            {% endfor %}
-        {% endif %}
-    </div>
-    <div class="mb-3">
-        {{ form.password.label }}
-        {{ form.password(class="form-control") }}
-        {% if form.password.errors %}
-            {% for error in form.password.errors %}
-            <div class="alert alert-danger mt-2" role="alert">
-                {{ error }}
-            </div>
-            {% endfor %}
-        {% endif %}
-    </div>
-    {{ form.submit(class="btn btn-primary") }}
-</form>
+{{ render_form(form) }}
+
 {% endblock %}

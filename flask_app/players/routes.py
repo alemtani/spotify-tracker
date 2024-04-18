@@ -4,7 +4,6 @@ from hashlib import md5
 from mongoengine.errors import ValidationError
 
 from ..models import User
-from ..utils import custom_404
 
 players = Blueprint('players', __name__)
 
@@ -30,16 +29,13 @@ def player_reviews(player_id):
 
 @players.route('/user/<user_id>')
 def user_profile(user_id):
-    try:
-        user = User.objects(id=user_id).first()
-        if not user:
-            raise ValidationError(f'User with id {user_id} does not exist.')
-        b64_img = user.get_b64_img()
-        image = f'data:image/png;base64,{b64_img}' if b64_img \
-            else f"https://www.gravatar.com/avatar/{md5(user.email.encode('utf-8')).hexdigest()}"
-        return render_template('user_profile.html', image=image, user=user)
-    except ValidationError as e:
-        return custom_404(e)
+    user = User.objects(id=user_id).first()
+    if not user:
+        raise ValidationError(f'User with id {user_id} does not exist.')
+    b64_img = user.get_b64_img()
+    image = f'data:image/png;base64,{b64_img}' if b64_img \
+        else f"https://www.gravatar.com/avatar/{md5(user.email.encode('utf-8')).hexdigest()}"
+    return render_template('user_profile.html', image=image, user=user)
 
 @players.route('/user/<user_id>/library')
 def user_library(user_id):

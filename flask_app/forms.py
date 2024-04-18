@@ -4,6 +4,7 @@ from flask_wtf.file import FileAllowed, FileField, FileRequired
 from wtforms import PasswordField, StringField, SubmitField, TextAreaField
 from wtforms.validators import Email, EqualTo, InputRequired, Length, Optional, ValidationError
 
+from . import bcrypt
 from .models import User
 
 """ *** User forms *** """
@@ -35,6 +36,11 @@ class UpdateAccountForm(FlaskForm):
     about = TextAreaField('About', validators=[Optional()])
     submit_account = SubmitField('Update Account')
 
+    def validate_username(self, username):
+        user = User.objects(username=username.data).first()
+        if user is not None and user != current_user:
+            raise ValidationError('Username is taken.')
+
 class UpdateProfilePicForm(FlaskForm):
     picture = FileField('Profile Picture', validators=[
         FileRequired(),
@@ -50,3 +56,8 @@ class UpdatePasswordForm(FlaskForm):
         EqualTo('new_password', 'Passwords must match!')
     ])
     submit_password = SubmitField('Update Password')
+
+    def validate_old_password(self, old_password):
+        password_match = bcrypt.check_password_hash(current_user.password, old_password.data)
+        if not password_match:
+            raise ValidationError('Old password is incorrect.')

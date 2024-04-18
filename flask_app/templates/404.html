@@ -1,10 +1,8 @@
-{% extends "layout.html" %}
+{% extends "base.html" %}
 
 {% block content %}
 
-<div class="container">
-    <h1>404 Not Found</h1>
-    <p class="lead">{{ error }}</p>
-</div>
+<h1 class="mb-3">Oops! An error occurred :&#40;</h1>
+<p class="lead">{{ error }}</p>
 
 {% endblock %}
