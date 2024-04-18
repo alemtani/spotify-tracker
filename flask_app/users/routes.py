@@ -35,7 +35,7 @@ def login():
     form = LoginForm()
     if request.method == 'POST':
         if form.validate_on_submit():
-            user = User.objects(username=form.username.data).first()
+            user = User.objects(email=form.email.data).first()
             password_match = user is not None and bcrypt.check_password_hash(user.password, form.password.data)
 
             if user is not None and password_match:
@@ -43,7 +43,7 @@ def login():
                 flash('Successfully logged in!', 'success')
                 return redirect(url_for('players.index'))
             else:
-                flash('Username or password is incorrect.', 'error')
+                flash('Email or password is incorrect.', 'error')
                 return redirect(url_for('users.login'))
 
     return render_template('login.html', title='Log In', form=form) 
@@ -71,16 +71,8 @@ def account():
                     flash('Username is taken.', 'error')
                     return redirect(url_for('users.account'))
             
-            # Check if new email is taken
-            if current_user.email != update_account_form.email.data:
-                new_user = User.objects(email=update_account_form.email.data).first()
-                if new_user is not None:
-                    flash('Email is taken.', 'error')
-                    return redirect(url_for('users.account'))
-            
             current_user.modify(
                 username=update_account_form.username.data,
-                email=update_account_form.email.data,
                 about=update_account_form.about.data
             )
             current_user.save()
@@ -106,7 +98,7 @@ def account():
                 flash('Old password is incorrect.', 'error')
                 return redirect(url_for('users.account'))
     
-    return render_template('account.html', title='Update Account', \
+    return render_template('account.html', title='Account Settings', \
                         update_account_form=update_account_form, \
                         update_profile_pic_form=update_profile_pic_form, \
                         update_password_form=update_password_form)

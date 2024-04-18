@@ -26,13 +26,12 @@ class RegistrationForm(FlaskForm):
             raise ValidationError('Email is taken.')
 
 class LoginForm(FlaskForm):
-    username = StringField('Username', validators=[InputRequired(), Length(min=1, max=40)])
+    email = StringField('Email', validators=[InputRequired(), Email()])
     password = PasswordField('Password', validators=[InputRequired()])
     submit = SubmitField('Log In')
 
 class UpdateAccountForm(FlaskForm):
     username = StringField('Username', validators=[InputRequired(), Length(min=1, max=40)])
-    email = StringField('Email', validators=[InputRequired(), Email()])
     about = TextAreaField('About', validators=[Optional()])
     submit_account = SubmitField('Update Account')
 
