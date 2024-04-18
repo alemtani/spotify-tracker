@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
 {% block content %}
-<h1 class="mb-3">Log In</h1>
+<h1 class="mb-3">{{ title }}</h1>
 <form method="POST">
     {{ form.csrf_token }}
     <div class="mb-3">

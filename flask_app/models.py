@@ -1,4 +1,6 @@
 from flask_login import UserMixin
+from werkzeug.utils import secure_filename
+
 from . import db, login_manager
 
 @login_manager.user_loader
@@ -14,3 +16,12 @@ class User(db.Document, UserMixin):
     
     def get_id(self):
         return self.username
+    
+    def set_profile_pic(self, img):        
+        filename = secure_filename(img.filename)
+        content_type = f'images/{filename[-3:]}'
+
+        if self.profile_pic.get():
+            self.profile_pic.replace(img.stream, content_type=content_type)
+        else:
+            self.profile_pic.put(img.stream, content_type=content_type)
