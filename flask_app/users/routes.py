@@ -40,6 +40,7 @@ def login():
 
             if user is not None and password_match:
                 login_user(user)
+                flash('Successfully logged in!', 'success')
                 return redirect(url_for('players.index'))
             else:
                 flash('Username or password is incorrect.', 'error')
@@ -51,6 +52,7 @@ def login():
 @login_required
 def logout():
     logout_user()
+    flash('Successfully logged out!', 'success')
     return redirect(url_for('players.index'))
 
 @users.route('/account', methods=['GET', 'POST'])
