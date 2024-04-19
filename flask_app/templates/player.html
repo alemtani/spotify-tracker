@@ -62,15 +62,18 @@
         </div>
         {% if current_user.is_authenticated %}
             <div class="d-grid gap-1 d-md-flex justify-content-md-start mb-3">
-                <form method="post">
-                    {{ add_form.csrf_token() }}
-                    {{ render_field(add_form.submit) }}
-                </form>
-                <a href="#" role="button" class="btn btn-secondary btn-md">Edit</a>
-                <form method="post">
-                    {{ delete_form.csrf_token() }}
-                    {{ render_field(delete_form.submit, button_style='danger') }}
-                </form>
+                {% if not tracker %}
+                    <form method="post">
+                        {{ add_form.csrf_token() }}
+                        {{ render_field(add_form.submit_add) }}
+                    </form>
+                {% else %}
+                    <a href="{{ url_for('players.edit_tracker', player_id=player.id) }}" role="button" class="btn btn-secondary btn-md">Edit</a>
+                    <form method="post">
+                        {{ delete_form.csrf_token() }}
+                        {{ render_field(delete_form.submit_delete, button_style='danger') }}
+                    </form>
+                {% endif %}
             </div>
         {% endif %}
         <div>

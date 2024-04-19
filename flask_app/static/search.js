@@ -79,5 +79,5 @@ $(function() {
     $('#q').bind('change', getSearchResults);
     $('input[name="item"]').bind('change', getSearchResults);
     $('#loader').bind('click', loadMoreSearchResults);
-    $('#loader').hide();
+    $('#loader').empty();
 });

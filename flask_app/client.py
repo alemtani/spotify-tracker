@@ -67,8 +67,11 @@ class Player(object):
             'duration': self.get_duration_str() if self.type == 'track' else None
         }
     
+    def get_artists_list(self):
+        return list(map(lambda artist: artist['name'], self.artists))
+    
     def get_artists_names(self):
-        return ','.join(list(map(lambda artist: artist['name'], self.artists)))
+        return ','.join(self.get_artists_list())
     
     def get_image(self):
         return self.image if self.type == 'album' else self.album.image

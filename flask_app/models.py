@@ -7,7 +7,7 @@ import base64
 
 from . import db, login_manager
 
-choices = ['added', 'listening', 'finished']
+choices = ['added', 'listening', 'done']
 
 @login_manager.user_loader
 def load_user(user_id):

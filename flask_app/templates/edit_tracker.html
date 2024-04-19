@@ -1,0 +1,25 @@
+{% from 'bootstrap5/form.html' import render_field, render_hidden_fields %}
+{% extends "base.html" %}
+
+{% block content %}
+
+<h1 class="mb-3">{{ title }}</h1>
+
+<form method="post">
+    {{ form.csrf_token() }}
+    {% if type == 'album' %}
+        {{ render_field(form.id) }}
+        {{ render_field(form.total_tracks) }}
+        <div class="mb-3">
+            <label for="listened_tracks" class="form-label">Listened Tracks</label>
+            <div class="input-group">
+                <input class="form-control" id="listened_tracks" name="listened_tracks" required="true" type="number" value="{{ listened_tracks }}" min="0" max="{{ total_tracks }}">
+                <span class="input-group-text">/ {{ total_tracks }}</span>
+            </div>
+        </div>
+    {% endif %}
+    {{ render_field(form.status) }}
+    {{ render_field(form.submit) }}
+</form>
+
+{% endblock %}
