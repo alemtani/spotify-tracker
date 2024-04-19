@@ -32,3 +32,21 @@ function addTrack(result) {
         </a>
     `);
 }
+
+function processResults(results) {
+    $('#spinner').addClass('invisible');
+    if (results.data.length === 0) return;
+    results.data.forEach(function(result) {
+        if (results['type'] == 'album') {
+            addAlbum(result);
+        } else {
+            addTrack(result);
+        }
+    });
+}
+
+function clearResults() {
+    $('#album-list').empty();
+    $('#track-list').empty();
+    $('#spinner').removeClass('invisible');
+}

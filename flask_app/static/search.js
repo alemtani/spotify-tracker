@@ -1,42 +1,29 @@
 let counter = 0;
 
+function processResultsSearch(results) {
+    processResults(results);
+    $('#loader').removeClass('invisible');
+    counter += results.data.length;
+}
+
 function getResults() {
     counter = 0; // reset counter
+    clearResults();
+    if (!$('#loader').hasClass('invisible')) $('#loader').addClass('invisible');
     $.getJSON($SCRIPT_ROOT + '/search', {
         q: $('#q').val(),
         item: $('input[name="item"]:checked').val()
-    }, function(results) {
-        if (results.data.length === 0) return;
-        $('#album-list').empty();
-        $('#track-list').empty();
-        results.data.forEach(function(result) {
-            if (results['type'] == 'album') {
-                addAlbum(result);
-            } else {
-                addTrack(result);
-            }
-        });
-        $('#loader').removeClass('invisible');
-        counter += results.data.length;
-    });
+    }, processResultsSearch);
 }
 
 function loadMoreResults() {
+    $('#spinner').removeClass('invisible');
+    $('#loader').addClass('invisible');
     $.getJSON($SCRIPT_ROOT + '/search', {
         q: $('#q').val(),
         item: $('input[name="item"]:checked').val(),
         offset: counter
-    }, function(results) {
-        if (results.data.length === 0) return;
-        results.data.forEach(function(result) {
-            if (results['type'] == 'album') {
-                addAlbum(result);
-            } else {
-                addTrack(result);
-            }
-        });
-        counter += results.data.length;
-    });
+    }, processResultsSearch);
 }
 
 $(function() {
