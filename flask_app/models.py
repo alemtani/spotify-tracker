@@ -47,7 +47,7 @@ class Tracker(db.Document):
     # We do this to "cache" the state, i.e. not call Spotify API to fetch library
     spotify_id = db.StringField(required=True, min_length=22, max_length=22)
     title = db.StringField(required=True)
-    artists = db.ListField(db_field='StringField', required=True)
+    artists = db.ListField(db_field='artists', required=True)
     image = db.StringField(required=True)
 
     # Non-required fields (for track)

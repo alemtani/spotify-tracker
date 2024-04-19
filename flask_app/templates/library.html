@@ -3,13 +3,11 @@
 
 {% block content %}
 
-<h1 class="mb-3">Track Your Music!</h1>
+<h1 class="mb-3">{{ title }}</h1>
 
-<div class="mb-3">
-    <input id="q" type="search" class="form-control" aria-label="Search" placeholder="Search">
-</div>
+<input type="hidden" id="userId" name="userId" value="{{ user_id }}">
 <div class="form-check form-check-inline">
-    <input class="form-check-input" type="radio" name="item" id="album" value="album" checked>
+    <input class="form-check-input" type="radio" name="item" id="album" value="album">
     <label class="form-check-label" for="album">Album</label>
 </div>
 <div class="form-check form-check-inline">
@@ -24,7 +22,6 @@
         <div class="list-group mb-3" id="track-list">
         </div>
     </div>
-    <button type="button" class="btn btn-primary invisible" id="loader">Load More...</button>
 </div>
 
 {% endblock %}
@@ -32,6 +29,6 @@
 {% block scripts %}
 
 {{ super() }}
-{{ render_static('js', 'search.js') }}
+{{ render_static('js', 'library.js') }}
 
 {% endblock %}

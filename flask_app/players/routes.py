@@ -129,7 +129,18 @@ def user_profile(user_id):
 
 @players.route('/user/<user_id>/library')
 def user_library(user_id):
-    return f'user {user_id} library'
+    return render_template('library.html', user_id=user_id)
+
+@players.route('/user/<user_id>/trackers')
+def user_tracks(user_id):
+    user = User.objects(id=user_id).first()
+    if not user:
+        raise ValidationError(f'User with id {user_id} does not exist')
+    item = request.args.get('item')
+    if not item:
+        return jsonify(data=[])
+    trackers = Tracker.objects(user=user, type=item)
+    return jsonify(data=trackers, type=item)
 
 @players.route('/user/<user_id>/reviews')
 def user_reviews(user_id):
