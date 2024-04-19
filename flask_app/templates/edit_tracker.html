@@ -1,4 +1,4 @@
-{% from 'bootstrap5/form.html' import render_field, render_hidden_fields %}
+{% from 'bootstrap5/form.html' import render_field, render_hidden_errors %}
 {% extends "base.html" %}
 
 {% block content %}
@@ -6,16 +6,24 @@
 <h1 class="mb-3">{{ title }}</h1>
 
 <form method="post">
-    {{ form.csrf_token() }}
+    {{ form.hidden_tag() }}
+    {{ render_hidden_errors(form) }}
     {% if type == 'album' %}
-        {{ render_field(form.id) }}
-        {{ render_field(form.total_tracks) }}
         <div class="mb-3">
-            <label for="listened_tracks" class="form-label">Listened Tracks</label>
-            <div class="input-group">
-                <input class="form-control" id="listened_tracks" name="listened_tracks" required="true" type="number" value="{{ listened_tracks }}" min="0" max="{{ total_tracks }}">
+            {{ form.listened_tracks.label }}
+            <div class="input-group {{ 'is-invalid' if form.listened_tracks.errors else '' }}">
+                {% if form.listened_tracks.errors %}
+                    {{ form.listened_tracks(class='form-control is-invalid') }}
+                {% else %}
+                    {{ form.listened_tracks(class='form-control') }}
+                {% endif %}
                 <span class="input-group-text">/ {{ total_tracks }}</span>
             </div>
+            {% if form.listened_tracks.errors %}
+                {% for error in form.listened_tracks.errors %}
+                    <div class="invalid-feedback d-block">{{ error }}</div>
+                {% endfor %}
+            {% endif %}
         </div>
     {% endif %}
     {{ render_field(form.status) }}

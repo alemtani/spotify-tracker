@@ -71,8 +71,7 @@ class DeletePlayerForm(FlaskForm):
     submit_delete = SubmitField('Delete')
 
 class EditAlbumPlayerForm(FlaskForm):
-    id = HiddenField()
-    total_tracks = HiddenField()
+    total_tracks = IntegerField(widget=HiddenField())
     listened_tracks = IntegerField('Listened Tracks', validators=[InputRequired()])
     status = SelectField('Status', choices=[
         ('added', 'Added'), 
@@ -80,6 +79,12 @@ class EditAlbumPlayerForm(FlaskForm):
         ('done', 'Done')
     ], validators=[InputRequired()])
     submit = SubmitField('Submit')
+
+    def validate_listened_tracks(self, listened_tracks):
+        if listened_tracks.data < 0:
+            raise ValidationError('Listened tracks cannot be negative')
+        if listened_tracks.data > self.total_tracks.data:
+            raise ValidationError('Listened tracks cannot exceed total tracks')
 
 class EditTrackPlayerForm(FlaskForm):
     status = SelectField('Status', choices=[

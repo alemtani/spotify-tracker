@@ -1,4 +1,4 @@
-{% from 'bootstrap5/form.html' import render_field %}
+{% from 'bootstrap5/form.html' import render_form %}
 {% extends "base.html" %}
 
 {% block content %}
@@ -38,7 +38,7 @@
                     Duration
                 </div>
                 <div class="col-8">
-                    {{ player.get_duration_str() }}
+                    {{ player.get_duration_strf() }}
                 </div>
             </div>
             <div class="row">
@@ -63,16 +63,10 @@
         {% if current_user.is_authenticated %}
             <div class="d-grid gap-1 d-md-flex justify-content-md-start mb-3">
                 {% if not tracker %}
-                    <form method="post">
-                        {{ add_form.csrf_token() }}
-                        {{ render_field(add_form.submit_add) }}
-                    </form>
+                    {{ render_form(add_form, button_style='success') }}
                 {% else %}
                     <a href="{{ url_for('players.edit_tracker', player_id=player.id) }}" role="button" class="btn btn-secondary btn-md">Edit</a>
-                    <form method="post">
-                        {{ delete_form.csrf_token() }}
-                        {{ render_field(delete_form.submit_delete, button_style='danger') }}
-                    </form>
+                    {{ render_form(delete_form, button_style='danger') }}
                 {% endif %}
             </div>
         {% endif %}
@@ -94,7 +88,7 @@
                         <p class="mb-0 opacity-75">{{ track.get_artists_names() }}</p>
                     </div>
                     <div class="col-md-2 text-end">
-                        <small class="opacity-50 text-nowrap">{{ track.get_duration_str() }}</small>
+                        <small class="opacity-50 text-nowrap">{{ track.get_duration_strf() }}</small>
                     </div>
                 </div>
             </a>

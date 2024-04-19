@@ -3,6 +3,8 @@ import json
 import requests
 import time
 
+from .utils import get_duration
+
 class Player(object):
     def __init__(self, data, detailed=False):
         self.id = data['id']
@@ -56,7 +58,7 @@ class Player(object):
             'artists': self.artists
         })
     
-    def toJSON(self):
+    def to_json(self):
         return {
             'id': self.id,
             'name': self.name,
@@ -64,8 +66,11 @@ class Player(object):
             'image': self.get_image(),
             'release_date': self.release_year if self.type == 'album' else None,
             'album': self.album.name if self.type == 'track' else None,
-            'duration': self.get_duration_str() if self.type == 'track' else None
+            'duration': self.get_duration_strf() if self.type == 'track' else None
         }
+    
+    def get_duration_strf(self):
+        return get_duration(self.duration_ms, self.type)
     
     def get_artists_list(self):
         return list(map(lambda artist: artist['name'], self.artists))
@@ -75,19 +80,6 @@ class Player(object):
     
     def get_image(self):
         return self.image if self.type == 'album' else self.album.image
-    
-    def get_duration_str(self):
-        if self.type == 'album':
-            duration_min = round(self.duration_ms / 1000 / 60)
-            hours, minutes = duration_min // 60, duration_min % 60
-            if hours == 0:
-                return f'{minutes} min'
-            else:
-                return f'{hours} hr {minutes} min'
-        else:
-            duration_s = round(self.duration_ms / 1000)
-            minutes, seconds = duration_s // 60, duration_s % 60
-            return f"{minutes}:{str(seconds).zfill(2)}"
     
     def get_release_date(self):
         return self.release_year if self.type == 'album' else self.album.release_year

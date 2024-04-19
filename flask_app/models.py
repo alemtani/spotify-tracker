@@ -6,6 +6,7 @@ from werkzeug.utils import secure_filename
 import base64
 
 from . import db, login_manager
+from .utils import get_duration
 
 choices = ['added', 'listening', 'done']
 
@@ -61,3 +62,14 @@ class Tracker(db.Document):
 
     def get_id(self):
         return str(self.id)
+
+    def get_player_json(self):
+        return {
+            'id': self.spotify_id,
+            'name': self.title,
+            'artists': self.artists,
+            'image': self.image,
+            'release_date': self.release_date if self.type == 'album' else None,
+            'album': self.album if self.type == 'track' else None,
+            'duration': get_duration(self.duration, 'track') if self.type == 'track' else None
+        }

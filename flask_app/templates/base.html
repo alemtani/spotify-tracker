@@ -1,5 +1,5 @@
 {% from 'bootstrap5/nav.html' import render_nav_item %}
-{% from 'bootstrap5/utils.html' import render_messages %}
+{% from 'bootstrap5/utils.html' import render_messages, render_static %}
 
 <!DOCTYPE html>
 <html lang="en" data-bs-theme="dark">
@@ -58,6 +58,7 @@
         <script>
             $SCRIPT_ROOT = {{ request.script_root|tojson }};
         </script>
+        {{ render_static('js', 'utils.js') }}
     {% endblock %}
 </body>
 </html>

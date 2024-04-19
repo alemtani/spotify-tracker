@@ -1,41 +1,6 @@
 let counter = 0;
 
-function appendAlbum(result) {
-    $('#album-list').append(`
-        <a class="col link-underline link-underline-opacity-0" href="${$SCRIPT_ROOT}/player/${result['id']}?item=album">
-            <div class="card shadow-sm">
-                <img class="bd-placeholder-img card-img-top" width="100%" src="${result['image']}">
-                <div class="card-body">
-                    <h5 class="card-title">${result['name']}</h5>
-                    <p class="card-text">${result['artists']}</p>
-                    <small class="text-body-secondary">${result['release_date']}</small>
-                </div>
-            </div>
-        </a>
-    `);
-}
-
-function appendTrack(result) {
-    $('#track-list').append(`
-        <a href="${$SCRIPT_ROOT}/player/${result['id']}?item=track" class="list-group-item list-group-item-action d-flex gap-3 py-3" aria-current="true">
-            <img src="${result['image']}" alt="twbs" width="32" height="32" class="rounded-circle flex-shrink-0">
-            <div class="row w-100">
-                <div class="col-md-5">
-                    <h6 class="mb-0">${result['name']}</h6>
-                    <p class="mb-0 opacity-75">${result['artists']}</p>
-                </div>
-                <div class="col-md-5">
-                    <p class="mb-0">${result['album']}</p>
-                </div>
-                <div class="col-md-2 text-end">
-                    <small class="opacity-50 text-nowrap">${result['duration']}</small>
-                </div>
-            </div>
-        </a>
-    `);
-}
-
-function getSearchResults() {
+function getResults() {
     counter = 0; // reset counter
     $.getJSON($SCRIPT_ROOT + '/search', {
         q: $('#q').val(),
@@ -46,9 +11,9 @@ function getSearchResults() {
         $('#track-list').empty();
         results.data.forEach(function(result) {
             if (results['type'] == 'album') {
-                appendAlbum(result);
+                addAlbum(result);
             } else {
-                appendTrack(result);
+                addTrack(result);
             }
         });
         $('#loader').removeClass('invisible');
@@ -56,7 +21,7 @@ function getSearchResults() {
     });
 }
 
-function loadMoreSearchResults() {
+function loadMoreResults() {
     $.getJSON($SCRIPT_ROOT + '/search', {
         q: $('#q').val(),
         item: $('input[name="item"]:checked').val(),
@@ -65,9 +30,9 @@ function loadMoreSearchResults() {
         if (results.data.length === 0) return;
         results.data.forEach(function(result) {
             if (results['type'] == 'album') {
-                appendAlbum(result);
+                addAlbum(result);
             } else {
-                appendTrack(result);
+                addTrack(result);
             }
         });
         counter += results.data.length;
@@ -75,7 +40,7 @@ function loadMoreSearchResults() {
 }
 
 $(function() {
-    $('#q').bind('change', getSearchResults);
-    $('input[name="item"]').bind('change', getSearchResults);
-    $('#loader').bind('click', loadMoreSearchResults);
+    $('#q').on('change', getResults);
+    $('input[name="item"]').on('change', getResults);
+    $('#loader').on('click', loadMoreResults);
 });

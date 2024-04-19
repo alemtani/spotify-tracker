@@ -24,7 +24,7 @@ def search():
     if not q or not item:
         return jsonify(data=[])
     result = spotify_client.search_for_item(q, item, offset=offset)
-    data = list(map(lambda player: player.toJSON(), result['items']))
+    data = list(map(lambda player: player.to_json(), result['items']))
     return jsonify(data=data, type=result['type'])
 
 @players.route('/player/<player_id>', methods=['GET', 'POST'])
@@ -93,8 +93,7 @@ def edit_tracker(player_id):
         if not tracker:
             raise ValidationError(f'Could not find tracker for Spotify player')
         
-        form = EditAlbumPlayerForm(obj=tracker) if tracker.type == 'album' \
-            else EditTrackPlayerForm(obj=tracker)
+        form = EditAlbumPlayerForm(obj=tracker) if tracker.type == 'album' else EditTrackPlayerForm(obj=tracker)
         if request.method == 'POST':
             if form.validate_on_submit():
                 if tracker.type == 'album':
@@ -105,9 +104,9 @@ def edit_tracker(player_id):
                 return redirect(url_for('players.player_detail', player_id=player_id, item=tracker.type))
 
         if tracker.type == 'album':
-            return render_template('edit_tracker.html', title=tracker.title, type=tracker.type, form=form, listened_tracks=tracker.listened_tracks, total_tracks=tracker.total_tracks)
+            return render_template('edit_tracker.html', title=f'Edit Tracker for {tracker.title}', type=tracker.type, form=form, total_tracks=tracker.total_tracks)
         else:
-            return render_template('edit_tracker.html', title=tracker.title, type=tracker.type, form=form)
+            return render_template('edit_tracker.html', title=f'Edit Tracker for {tracker.title}', type=tracker.type, form=form)
     
     except ValidationError as e:
         abort(404, e)
@@ -140,7 +139,8 @@ def user_tracks(user_id):
     if not item:
         return jsonify(data=[])
     trackers = Tracker.objects(user=user, type=item)
-    return jsonify(data=trackers, type=item)
+    data = list(map(lambda tracker: tracker.get_player_json(), trackers))
+    return jsonify(data=data, type=item)
 
 @players.route('/user/<user_id>/reviews')
 def user_reviews(user_id):
