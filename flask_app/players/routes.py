@@ -3,13 +3,14 @@ from hashlib import md5
 from mongoengine.errors import ValidationError
 
 from .. import spotify_client
+from ..forms import AddPlayerForm, DeletePlayerForm
 from ..models import User
 
 players = Blueprint('players', __name__)
 
 """ *** Player view functions *** """
 
-@players.route('/', methods=['GET', 'POST'])
+@players.route('/')
 def index():
     return render_template('index.html')
 
@@ -26,7 +27,17 @@ def search():
 
 @players.route('/player/<player_id>', methods=['GET', 'POST'])
 def player_detail(player_id):
-    return f'player {player_id}'
+    add_form = AddPlayerForm()
+    delete_form = DeletePlayerForm()
+
+    try:
+        item = request.args.get('item')
+        if item not in ['album', 'track']:
+            raise ValueError(f'A player must be an album or track')
+        player = spotify_client.get_player_by_id(item, player_id)
+        return render_template('player.html', player=player, add_form=add_form, delete_form=delete_form)
+    except ValueError as e:
+        abort(404, e)
 
 @players.route('/player/<player_id>/reviews')
 def player_reviews(player_id):

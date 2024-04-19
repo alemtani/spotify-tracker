@@ -4,7 +4,7 @@
 
 {% block content %}
 
-<h1 class="mb-3">Track Your Albums and Songs!</h1>
+<h1 class="mb-3">Track Your Music!</h1>
 
 <div class="mb-3">
     <input id="q" type="search" class="form-control" aria-label="Search" placeholder="Search">
@@ -22,12 +22,11 @@
     <div class="container">
         <div class="album row row-cols-1 row-cols-sm-2 row-cols-md-4 g-3" id="album-list">
         </div>
-        <div class="list-group" id="track-list">
+        <div class="list-group mb-3" id="track-list">
         </div>
     </div>
+    <button type="button" class="btn btn-primary" id="loader">Load More...</button>
 </div>
-
-<button type="button" class="btn btn-primary mb-3" id="loader">Load More...</button>
 
 {% endblock %}
 

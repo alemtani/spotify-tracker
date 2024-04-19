@@ -1,0 +1,103 @@
+{% from 'bootstrap5/form.html' import render_field %}
+{% extends "base.html" %}
+
+{% block content %}
+
+{# Hero Source: https://getbootstrap.com/docs/5.3/examples/heroes/ #}
+<div class="container col-xxl-8 px-4 py-4">
+    <div class="row flex-lg-row-reverse align-items-center g-5 py-4">
+      <div class="col-lg-4">
+        <img src="{{ player.get_image() }}" class="d-block mx-lg-auto img-fluid" alt="{{ player.name }} Image" width="300" height="300" loading="lazy">
+      </div>
+      <div class="col-lg-8">
+        <h1 class="display-5 fw-bold text-body-emphasis lh-1 mb-3">{{ player.name }}</h1>
+        {% if player.type == 'album' %}
+            <p class="lead">{{ player.album_type.capitalize() }}</p>
+        {% else %}
+            <p class="lead"><a class="link-offset-2 link-underline link-underline-opacity-0" href="{{ url_for('players.player_detail', player_id=player.album.id, item='album') }}">{{ player.album.name }}</a></p>
+        {% endif %}
+        <div class="container mb-3">
+            <div class="row">
+                <div class="col-4">
+                    Artists
+                </div>
+                <div class="col-8">
+                    {{ player.get_artists_names() }}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-4">
+                    Release
+                </div>
+                <div class="col-8">
+                    {{ player.get_release_date() }}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-4">
+                    Duration
+                </div>
+                <div class="col-8">
+                    {{ player.get_duration_str() }}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-4">
+                    Popularity
+                </div>
+                <div class="col-8">
+                    {{ player.popularity }}
+                </div>
+            </div>
+            {% if player.type == 'album' and player.genres %}
+                <div class="row">
+                    <div class="col-4">
+                        Genres
+                    </div>
+                    <div class="col-8">
+                        {{ player.get_genres_list() }}
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+        {% if current_user.is_authenticated %}
+            <div class="d-grid gap-1 d-md-flex justify-content-md-start mb-3">
+                <form method="post">
+                    {{ add_form.csrf_token() }}
+                    {{ render_field(add_form.submit) }}
+                </form>
+                <a href="#" role="button" class="btn btn-secondary btn-md">Edit</a>
+                <form method="post">
+                    {{ delete_form.csrf_token() }}
+                    {{ render_field(delete_form.submit, button_style='danger') }}
+                </form>
+            </div>
+        {% endif %}
+        <div>
+            <a href="{{ url_for('players.player_reviews', player_id=player.id) }}" role="button" class="btn btn-warning btn-md">Reviews</a>
+        </div>
+      </div>
+    </div>
+</div>
+
+{% if player.type == 'album' %}
+<div class="container">
+    <div class="list-group mb-3">
+        {% for track in player.tracks %}
+            <a href="{{ url_for('players.player_detail', player_id=track.id, item='track') }}" class="list-group-item list-group-item-action d-flex gap-3 py-3" aria-current="true">
+                <div class="row w-100">
+                    <div class="col-md-10">
+                        <h6 class="mb-0">{{ track.name }}</h6>
+                        <p class="mb-0 opacity-75">{{ track.get_artists_names() }}</p>
+                    </div>
+                    <div class="col-md-2 text-end">
+                        <small class="opacity-50 text-nowrap">{{ track.get_duration_str() }}</small>
+                    </div>
+                </div>
+            </a>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+{% endblock %}

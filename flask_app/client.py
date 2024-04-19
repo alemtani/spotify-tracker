@@ -9,10 +9,9 @@ class Player(object):
         self.name = data['name']
         self.type = data['type']
         self.artists = data['artists']
-        self.detailed = detailed
 
         if self.type == 'album':
-            self.image = data['images'][0] if data['images'] else None
+            self.image = data['images'][0]['url'] if data['images'] else None
             self.release_year = int(data['release_date'][:4])
         else:
             self.duration_ms = data['duration_ms']
@@ -39,7 +38,7 @@ class Player(object):
             'name': self.name,
             'type': 'album',
             'artists': self.artists,
-            'images': [self.image] if self.image else None,
+            'images': [{'url': self.image}] if self.image else None,
             'release_date': str(self.release_year),
         }
         
@@ -58,16 +57,40 @@ class Player(object):
         })
     
     def toJSON(self):
-        if not self.detailed:
-            return {
-                'id': self.id,
-                'name': self.name,
-                'artists': list(map(lambda artist: artist['name'], self.artists)),
-                'image': self.image if self.type == 'album' else self.album.image,
-                'release_date': self.release_year if self.type == 'album' else None,
-                'album': self.album.name if self.type == 'track' else None,
-                'duration': self.duration_ms if self.type == 'track' else None
-            }
+        return {
+            'id': self.id,
+            'name': self.name,
+            'artists': self.get_artists_names(),
+            'image': self.get_image(),
+            'release_date': self.release_year if self.type == 'album' else None,
+            'album': self.album.name if self.type == 'track' else None,
+            'duration': self.get_duration_str() if self.type == 'track' else None
+        }
+    
+    def get_artists_names(self):
+        return ','.join(list(map(lambda artist: artist['name'], self.artists)))
+    
+    def get_image(self):
+        return self.image if self.type == 'album' else self.album.image
+    
+    def get_duration_str(self):
+        if self.type == 'album':
+            duration_min = round(self.duration_ms / 1000 / 60)
+            hours, minutes = duration_min // 60, duration_min % 60
+            if hours == 0:
+                return f'{minutes} min'
+            else:
+                return f'{hours} hr {minutes} min'
+        else:
+            duration_s = round(self.duration_ms / 1000)
+            minutes, seconds = duration_s // 60, duration_s % 60
+            return f"{minutes}:{str(seconds).zfill(2)}"
+    
+    def get_release_date(self):
+        return self.release_year if self.type == 'album' else self.album.release_year
+
+    def get_genres_list(self):
+        return ','.join(list(map(lambda genre: genre.capitalize(), self.genres)))
 
 class SpotifyClient(object):
     def __init__(self, client_id, client_secret):

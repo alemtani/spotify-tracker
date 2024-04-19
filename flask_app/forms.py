@@ -64,3 +64,9 @@ class UpdatePasswordForm(FlaskForm):
 
 """ *** Player forms *** """
 
+class AddPlayerForm(FlaskForm):
+    submit = SubmitField('Add')
+
+class DeletePlayerForm(FlaskForm):
+    submit = SubmitField('Delete')
+
