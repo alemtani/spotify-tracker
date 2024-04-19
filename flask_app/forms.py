@@ -61,3 +61,6 @@ class UpdatePasswordForm(FlaskForm):
         password_match = bcrypt.check_password_hash(current_user.password, old_password.data)
         if not password_match:
             raise ValidationError('Old password is incorrect.')
+
+""" *** Player forms *** """
+

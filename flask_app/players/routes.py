@@ -1,8 +1,8 @@
-from flask import Blueprint, render_template
-from flask_login import current_user
+from flask import Blueprint, abort, jsonify, render_template, request
 from hashlib import md5
 from mongoengine.errors import ValidationError
 
+from .. import spotify_client
 from ..models import User
 
 players = Blueprint('players', __name__)
@@ -15,7 +15,14 @@ def index():
 
 @players.route('/search', methods=['GET'])
 def search():
-    return 'search'
+    q = request.args.get('q')
+    item = request.args.get('item')
+    offset = request.args.get('offset', 0, type=int)
+    if not q or not item:
+        return jsonify(data=[])
+    result = spotify_client.search_for_item(q, item, offset=offset)
+    data = list(map(lambda player: player.toJSON(), result['items']))
+    return jsonify(data=data, type=result['type'])
 
 @players.route('/player/<player_id>', methods=['GET', 'POST'])
 def player_detail(player_id):
@@ -29,13 +36,16 @@ def player_reviews(player_id):
 
 @players.route('/user/<user_id>')
 def user_profile(user_id):
-    user = User.objects(id=user_id).first()
-    if not user:
-        raise ValidationError(f'User with id {user_id} does not exist.')
-    b64_img = user.get_b64_img()
-    image = f'data:image/png;base64,{b64_img}' if b64_img \
-        else f"https://www.gravatar.com/avatar/{md5(user.email.encode('utf-8')).hexdigest()}"
-    return render_template('user_profile.html', image=image, user=user)
+    try:
+        user = User.objects(id=user_id).first()
+        if not user:
+            raise ValidationError(f'User with id {user_id} does not exist')
+        b64_img = user.get_b64_img()
+        image = f'data:image/png;base64,{b64_img}' if b64_img \
+            else f"https://www.gravatar.com/avatar/{md5(user.email.encode('utf-8')).hexdigest()}"
+        return render_template('user_profile.html', image=image, user=user)
+    except ValidationError as e:
+        abort(404, e)
 
 @players.route('/user/<user_id>/library')
 def user_library(user_id):

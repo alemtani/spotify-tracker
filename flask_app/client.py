@@ -1,6 +1,6 @@
 import base64
-import requests
 import json
+import requests
 import time
 
 class Player(object):
@@ -9,6 +9,7 @@ class Player(object):
         self.name = data['name']
         self.type = data['type']
         self.artists = data['artists']
+        self.detailed = detailed
 
         if self.type == 'album':
             self.image = data['images'][0] if data['images'] else None
@@ -55,6 +56,18 @@ class Player(object):
             'type': self.type,
             'artists': self.artists
         })
+    
+    def toJSON(self):
+        if not self.detailed:
+            return {
+                'id': self.id,
+                'name': self.name,
+                'artists': list(map(lambda artist: artist['name'], self.artists)),
+                'image': self.image if self.type == 'album' else self.album.image,
+                'release_date': self.release_year if self.type == 'album' else None,
+                'album': self.album.name if self.type == 'track' else None,
+                'duration': self.duration_ms if self.type == 'track' else None
+            }
 
 class SpotifyClient(object):
     def __init__(self, client_id, client_secret):
@@ -107,10 +120,7 @@ class SpotifyClient(object):
         data = data[f'{item}s']
 
         result = {
-            'next': offset + data['limit'] \
-                if offset + data['limit'] < offset + data['total'] else None,
-            'prev': offset - data['limit'] \
-                if offset - data['limit'] >= 0 else None,
+            'type': item,
             'items': []
         }
 
