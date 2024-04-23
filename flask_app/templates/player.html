@@ -1,4 +1,4 @@
-{% from 'bootstrap5/form.html' import render_form %}
+{% from 'bootstrap5/form.html' import render_field, render_form %}
 {% from 'bootstrap5/utils.html' import render_icon %}
 
 {% extends "base.html" %}
@@ -68,10 +68,16 @@
         {% if current_user.is_authenticated %}
             <div class="d-grid gap-1 d-md-flex justify-content-md-start mb-3">
                 {% if not tracker %}
-                    {{ render_form(add_form, button_style='success') }}
+                    <form method="POST">
+                        {{ add_form.csrf_token() }}
+                        {{ render_field(add_form.submit_add, button_style='success', class='w-100') }}
+                    </form>
                 {% else %}
                     <a href="{{ url_for('players.edit_tracker', player_id=player.id) }}" role="button" class="btn btn-secondary btn-md">Edit</a>
-                    {{ render_form(delete_form, button_style='danger') }}
+                    <form method="POST">
+                        {{ delete_form.csrf_token() }}
+                        {{ render_field(delete_form.submit_delete, button_style='danger', class='w-100') }}
+                    </form>
                 {% endif %}
             </div>
         {% endif %}
