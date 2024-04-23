@@ -1,0 +1,9 @@
+.list-group-footer {
+    text-align: right;
+}
+
+@media (width < 768px) {
+    .list-group-footer {
+        text-align: left;
+    }
+}

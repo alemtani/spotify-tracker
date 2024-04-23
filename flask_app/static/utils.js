@@ -17,7 +17,7 @@ function addTrack(result) {
     $('#track-list').append(`
         <a href="${$SCRIPT_ROOT}/player/${result['id']}?item=track" class="list-group-item list-group-item-action d-flex gap-3 py-3" aria-current="true">
             <img src="${result['image']}" alt="twbs" width="32" height="32" class="rounded-circle flex-shrink-0">
-            <div class="row w-100">
+            <div class="row w-100 g-2">
                 <div class="col-md-5">
                     <h6 class="mb-0">${result['name']}</h6>
                     <p class="mb-0 opacity-75">${result['artists']}</p>
@@ -25,7 +25,7 @@ function addTrack(result) {
                 <div class="col-md-5">
                     <p class="mb-0">${result['album']}</p>
                 </div>
-                <div class="col-md-2 text-end">
+                <div class="col-md-2 list-group-footer">
                     <small class="opacity-50 text-nowrap">${result['duration']}</small>
                 </div>
             </div>
