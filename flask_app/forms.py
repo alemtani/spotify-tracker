@@ -2,7 +2,7 @@ from flask_login import current_user
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileAllowed, FileField, FileRequired
 from wtforms import HiddenField, IntegerField, PasswordField, SelectField, StringField, SubmitField, TextAreaField
-from wtforms.validators import Email, EqualTo, InputRequired, Length, Optional, ValidationError
+from wtforms.validators import Email, EqualTo, InputRequired, Length, NumberRange, Optional, ValidationError
 
 from . import bcrypt
 from .models import User
@@ -94,3 +94,7 @@ class EditTrackPlayerForm(FlaskForm):
     ], validators=[InputRequired()])
     submit = SubmitField('Submit')
 
+class ReviewForm(FlaskForm):
+    rating = IntegerField('Rating', validators=[InputRequired(), NumberRange(min=1, max=10)])
+    comment = TextAreaField('Comment (optional)', validators=[Optional()])
+    submit = SubmitField('Submit Review')

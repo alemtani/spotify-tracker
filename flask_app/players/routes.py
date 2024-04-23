@@ -4,9 +4,9 @@ from hashlib import md5
 from mongoengine.errors import ValidationError
 
 from .. import spotify_client
-from ..forms import AddPlayerForm, DeletePlayerForm, EditAlbumPlayerForm, EditTrackPlayerForm
-from ..models import Tracker, User
-from ..utils import current_time
+from ..forms import AddPlayerForm, DeletePlayerForm, EditAlbumPlayerForm, EditTrackPlayerForm, ReviewForm
+from ..models import Review, Tracker, User
+from ..utils import current_time, str2datetime
 
 players = Blueprint('players', __name__)
 
@@ -37,8 +37,16 @@ def player_detail(player_id):
         if item not in ['album', 'track']:
             raise ValueError(f'A player must be an album or track')
         player = spotify_client.get_player_by_id(item, player_id)
-        tracker = Tracker.objects(spotify_id=player_id, user=current_user).first() \
-            if current_user.is_authenticated else None
+        tracker = Tracker.objects(spotify_id=player_id, user=current_user).first() if current_user.is_authenticated else None
+        user_review = Review.objects(spotify_id=player_id, user=current_user).first() if current_user.is_authenticated else None
+        reviews = Review.objects(spotify_id=player_id)
+        rating = reviews.average('rating')
+
+        # Sort reviews
+        reviews = list(reviews)
+        reviews.sort(key=lambda review: str2datetime(review.last_updated), reverse=True)
+
+        review_form = ReviewForm(obj=user_review)
 
         if request.method == 'POST':
             if add_form.submit_add.data and add_form.validate_on_submit():
@@ -75,15 +83,33 @@ def player_detail(player_id):
                 tracker.delete()
                 flash('Successfully deleted tracker!', 'success')
                 return redirect(url_for('players.player_detail', player_id=player_id, item=item))
+            
+            if review_form.submit.data and review_form.validate_on_submit():
+                if not user_review:
+                    user_review = Review(
+                        user = current_user, 
+                        last_updated = current_time(),
+                        rating = review_form.rating.data,
+                        comment = review_form.comment.data,
+                        spotify_id = player_id,
+                        title = player.name,
+                        type = item
+                    )
+                else:
+                    user_review.modify(
+                        last_updated = current_time(),
+                        rating = review_form.rating.data,
+                        comment = review_form.comment.data
+                    )
+                user_review.save()
+                flash('Successfully created review!', 'success')
+                return redirect(url_for('players.player_detail', player_id=player_id, item=item))
 
-        return render_template('player.html', player=player, add_form=add_form, delete_form=delete_form, tracker=tracker)
+        return render_template('player.html', player=player, add_form=add_form, delete_form=delete_form, review_form=review_form, \
+                               tracker=tracker, rating=rating, reviews=reviews, user_review=user_review)
     
     except ValueError as e:
         abort(404, e)
-
-@players.route('/player/<player_id>/reviews')
-def player_reviews(player_id):
-    return f'player {player_id} reviews'
 
 @players.route('/player/<player_id>/edit', methods=['GET', 'POST'])
 @login_required
@@ -144,4 +170,11 @@ def user_tracks(user_id):
 
 @players.route('/user/<user_id>/reviews')
 def user_reviews(user_id):
-    return f'user {user_id} reviews'
+    try:
+        user = User.objects(id=user_id).first()
+        if not user:
+            raise ValidationError(f'User with id {user_id} does not exist')
+        reviews = Review.objects(user=user)
+        return render_template('reviews.html', reviews=reviews)
+    except ValidationError as e:
+        abort(404, e)

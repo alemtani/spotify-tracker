@@ -73,3 +73,17 @@ class Tracker(db.Document):
             'album': self.album if self.type == 'track' else None,
             'duration': get_duration(self.duration, 'track') if self.type == 'track' else None
         }
+
+class Review(db.Document):
+    user = db.ReferenceField(document_type=User, required=True)
+    last_updated = db.StringField(required=True)
+    rating = db.IntField(required=True, min_value=1, max_value=10)
+    type = db.StringField(required=True)
+    comment = db.StringField()
+
+    # We do this to "cache" the state, i.e. not call Spotify API to fetch reviews
+    spotify_id = db.StringField(required=True, min_length=22, max_length=22)
+    title = db.StringField(required=True)
+
+    def get_id(self):
+        return self(str.id)

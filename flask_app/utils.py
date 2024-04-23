@@ -3,6 +3,9 @@ from datetime import datetime
 def current_time():
     return datetime.now().strftime('%B %d, %Y at %H:%M:%S')
 
+def str2datetime(strtime):
+    return datetime.strptime(strtime, '%B %d, %Y at %H:%M:%S')
+
 def get_duration(duration_ms, item):
     if item == 'album':
         duration_min = round(duration_ms / 1000 / 60)

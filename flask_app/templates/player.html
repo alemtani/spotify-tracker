@@ -1,4 +1,6 @@
 {% from 'bootstrap5/form.html' import render_form %}
+{% from 'bootstrap5/utils.html' import render_icon %}
+
 {% extends "base.html" %}
 
 {% block content %}
@@ -60,6 +62,9 @@
                 </div>
             {% endif %}
         </div>
+        <h5 class="my-3">
+            {{ render_icon('star-fill', color='warning') }} {{ rating if rating else 'N/A' }}
+        </h5>
         {% if current_user.is_authenticated %}
             <div class="d-grid gap-1 d-md-flex justify-content-md-start mb-3">
                 {% if not tracker %}
@@ -70,16 +75,13 @@
                 {% endif %}
             </div>
         {% endif %}
-        <div>
-            <a href="{{ url_for('players.player_reviews', player_id=player.id) }}" role="button" class="btn btn-warning btn-md">Reviews</a>
-        </div>
       </div>
     </div>
 </div>
 
 {% if player.type == 'album' %}
 <div class="container">
-    <div class="list-group mb-3">
+    <div class="list-group mb-5">
         {% for track in player.tracks %}
             <a href="{{ url_for('players.player_detail', player_id=track.id, item='track') }}" class="list-group-item list-group-item-action d-flex gap-3 py-3" aria-current="true">
                 <div class="row w-100">
@@ -96,5 +98,35 @@
     </div>
 </div>
 {% endif %}
+
+<div class="container">
+    <h3 class="mb-3">Reviews</h3>
+    {% if current_user.is_authenticated %}
+        <div class="container mb-3 py-3 border rounded">
+            <h5 class="mb-3">Submit Review</h5>
+            {{ render_form(review_form) }}
+        </div>
+    {% endif %}
+    <div class="list-group mb-3">
+        {% if reviews %}
+            {% for review in reviews %}
+                <a href="{{ url_for('players.user_profile', user_id=review.user.id) }}" class="list-group-item list-group-item-action d-flex gap-3 py-3" aria-current="true">
+                    <div class="row w-100">
+                        <div class="col-md-10">
+                            <h6 class="mb-0">{{ review.user.username }}</h6>
+                            <p class="mb-2 opacity-75">{{ review.last_updated }}</p>
+                            <p>{{ review.comment }}</p>
+                        </div>
+                        <div class="col-md-2 text-end">
+                            <small class="text-nowrap">{{ render_icon('star-fill', color='warning') }} {{ review.rating }}</small>
+                        </div>
+                    </div>
+                </a>
+            {% endfor %}
+        {% else %}
+            <p>No reviews so far...</p>
+        {% endif %}
+    </div>
+</div>
 
 {% endblock %}
