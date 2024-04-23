@@ -175,6 +175,8 @@ def user_reviews(user_id):
         if not user:
             raise ValidationError(f'User with id {user_id} does not exist')
         reviews = Review.objects(user=user)
+        reviews = list(reviews)
+        reviews.sort(key=lambda review: str2datetime(review.last_updated), reverse=True)
         return render_template('reviews.html', reviews=reviews)
     except ValidationError as e:
         abort(404, e)
