@@ -26,6 +26,7 @@
             <p>No reviews so far...</p>
         {% endif %}
     </div>
+    <a href="{{ url_for('players.user_profile', user_id=user.id) }}" role="button" class="btn btn-secondary mb-3">Back to Profile</a>
 </div>
 
 {% endblock %}

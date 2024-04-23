@@ -6,13 +6,31 @@
 <h1 class="mb-3">{{ title }}</h1>
 
 <input type="hidden" id="userId" name="userId" value="{{ user_id }}">
-<div class="form-check form-check-inline">
-    <input class="form-check-input" type="radio" name="item" id="album" value="album">
-    <label class="form-check-label" for="album">Album</label>
+
+<div class="mt-3">
+    <div class="form-check form-check-inline">
+        <input class="form-check-input" type="radio" name="item" id="album" value="album">
+        <label class="form-check-label" for="album">Album</label>
+    </div>
+    <div class="form-check form-check-inline">
+        <input class="form-check-input" type="radio" name="item" id="track" value="track">
+        <label class="form-check-label" for="track">Track</label>
+    </div>
 </div>
-<div class="form-check form-check-inline">
-    <input class="form-check-input" type="radio" name="item" id="track" value="track">
-    <label class="form-check-label" for="track">Track</label>
+
+<div class="mt-3">
+    <div class="form-check form-check-inline">
+        <input class="form-check-input" type="checkbox" name="status" id="s1" value="added" checked>
+        <label class="form-check-label" for="s1">Added</label>
+    </div>
+    <div class="form-check form-check-inline">
+        <input class="form-check-input" type="checkbox" name="status" id="s2" value="listening" checked>
+        <label class="form-check-label" for="s2">Listening</label>
+    </div>
+    <div class="form-check form-check-inline">
+        <input class="form-check-input" type="checkbox" name="status" id="s3" value="done" checked>
+        <label class="form-check-label" for="s3">Done</label>
+    </div>
 </div>
 
 <div class="mt-3 py-5">
@@ -26,6 +44,8 @@
         <span class="visually-hidden">Loading...</span>
     </div>
 </div>
+
+<a href="{{ url_for('players.user_profile', user_id=user_id) }}" role="button" class="btn btn-secondary mb-3">Back to Profile</a>
 
 {% endblock %}
 

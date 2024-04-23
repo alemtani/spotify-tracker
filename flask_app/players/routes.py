@@ -46,6 +46,17 @@ def player_detail(player_id):
         reviews = list(reviews)
         reviews.sort(key=lambda review: str2datetime(review.last_updated), reverse=True)
 
+        # Track reviews (will look good)
+        track_ids = list(map(lambda track: track.id, player.tracks)) if item == 'album' else []
+        track_reviews = Review.objects(spotify_id__in=track_ids)
+        track_ratings = {}
+        counts = {}
+        for review in track_reviews:
+            track_ratings[review.spotify_id] = track_ratings.get(review.spotify_id, 0) + review.rating
+            counts[review.spotify_id] = counts.get(review.spotify_id, 0) + 1
+        for spotify_id in track_ratings:
+            track_ratings[spotify_id] = round(track_ratings[spotify_id] / counts[spotify_id], 1)
+
         review_form = ReviewForm(obj=user_review)
 
         if request.method == 'POST':
@@ -104,9 +115,10 @@ def player_detail(player_id):
                 user_review.save()
                 flash('Successfully created review!', 'success')
                 return redirect(url_for('players.player_detail', player_id=player_id, item=item))
-
-        return render_template('player.html', player=player, add_form=add_form, delete_form=delete_form, review_form=review_form, \
-                               tracker=tracker, rating=rating, reviews=reviews, user_review=user_review)
+        
+        return render_template('player.html', player=player, add_form=add_form, delete_form=delete_form, \
+                               review_form=review_form, tracker=tracker, rating=rating, reviews=reviews, \
+                                user_review=user_review, track_ratings=track_ratings)
     
     except ValueError as e:
         abort(404, e)
@@ -123,16 +135,23 @@ def edit_tracker(player_id):
         if request.method == 'POST':
             if form.validate_on_submit():
                 if tracker.type == 'album':
-                    tracker.modify(listened_tracks=form.listened_tracks.data)
+                    listened_tracks = form.listened_tracks.data
+                    if form.status.data == 'done':
+                        listened_tracks = tracker.total_tracks
+                    if form.status.data == 'added':
+                        listened_tracks = 0
+                    tracker.modify(listened_tracks=listened_tracks)
                 tracker.modify(status=form.status.data, last_updated=current_time())
                 tracker.save()
                 flash('Successfully updated tracker!', 'success')
                 return redirect(url_for('players.player_detail', player_id=player_id, item=tracker.type))
 
         if tracker.type == 'album':
-            return render_template('edit_tracker.html', title=f'Edit Tracker for {tracker.title}', type=tracker.type, form=form, total_tracks=tracker.total_tracks)
+            return render_template('edit_tracker.html', title=f'Edit Tracker for {tracker.title}', \
+                                   type=tracker.type, form=form, player_id=player_id, total_tracks=tracker.total_tracks)
         else:
-            return render_template('edit_tracker.html', title=f'Edit Tracker for {tracker.title}', type=tracker.type, form=form)
+            return render_template('edit_tracker.html', title=f'Edit Tracker for {tracker.title}', \
+                                   type=tracker.type, form=form, player_id=player_id)
     
     except ValidationError as e:
         abort(404, e)
@@ -162,9 +181,11 @@ def user_tracks(user_id):
     if not user:
         raise ValidationError(f'User with id {user_id} does not exist')
     item = request.args.get('item')
-    if not item:
+    status = request.args.get('status')
+    if not item or not status:
         return jsonify(data=[])
-    trackers = Tracker.objects(user=user, type=item)
+    status = status.split(',')
+    trackers = Tracker.objects(user=user, type=item, status__in=status)
     data = list(map(lambda tracker: tracker.get_player_json(), trackers))
     return jsonify(data=data, type=item)
 
@@ -177,6 +198,6 @@ def user_reviews(user_id):
         reviews = Review.objects(user=user)
         reviews = list(reviews)
         reviews.sort(key=lambda review: str2datetime(review.last_updated), reverse=True)
-        return render_template('reviews.html', reviews=reviews)
+        return render_template('reviews.html', reviews=reviews, user=user)
     except ValidationError as e:
         abort(404, e)
