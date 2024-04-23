@@ -1,5 +1,5 @@
 
-## CMSC 388J Final Project Proposal
+## CMSC 388J Final Project Writeup
 
 **Group Members (1-4 members):**
 
