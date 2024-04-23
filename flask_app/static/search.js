@@ -2,6 +2,7 @@ let counter = 0;
 
 function processResultsSearch(results) {
     processResults(results);
+    if (results.data.length === 0) return;
     $('#loader').removeClass('invisible');
     counter += results.data.length;
 }
