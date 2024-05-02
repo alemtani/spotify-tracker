@@ -30,8 +30,16 @@ python3 -c 'import secrets; print(secrets.token_hex())'
 This is your connection string to the MongoDB Atlas cluster. For instructions on how to get it, see [here](https://www.mongodb.com/docs/guides/atlas/connection-string/). An example string looks like this:
 
 ```
-mongodb+srv://<mongodbuser>:<password>@cluster0.gy12rxn.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
+mongodb+srv://<mongodbuser>:<password>@cluster0.gy12rxn.mongodb.net/<collection>?retryWrites=true&w=majority&appName=Cluster0
 ```
+
+Once you have the option to connect to your cluster, do the following:
+
+1. For **Connect to your application**, choose **Drivers**.
+2. Find the connection string at the bottom and copy-paste. Fill out the following fields.
+    1. `mongodbuser` - The mongodb user that owns the database.
+    2. `password` - The password for the specified mongodb user.
+    3. `collection` - The name of the collection to store the records (can name it anything you want).
 
 `CLIENT_ID`
 
