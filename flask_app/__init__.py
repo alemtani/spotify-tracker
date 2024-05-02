@@ -4,7 +4,6 @@ from flask_bcrypt import Bcrypt
 from flask_login import LoginManager
 from flask_mongoengine import MongoEngine
 
-import base64
 import os
 
 # Create a new Spotify client
@@ -28,7 +27,7 @@ def create_app(test_config=None):
     app = Flask(__name__)
 
     # Load environment variables into config
-    app.config['SECRET_KEY'] = base64.b64decode(os.environ.get('SECRET_KEY', 'default_secret_key'))
+    app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'default_secret_key')
     app.config['MONGODB_HOST'] = os.environ.get('MONGODB_HOST', 'default_mongodb_host')
     app.config['CLIENT_ID'] = os.environ.get('CLIENT_ID', 'default_client_id')
     app.config['CLIENT_SECRET'] = os.environ.get('CLIENT_SECRET', 'default_client_secret')
