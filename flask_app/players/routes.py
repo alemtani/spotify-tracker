@@ -173,7 +173,13 @@ def user_profile(user_id):
 
 @players.route('/user/<user_id>/library')
 def user_library(user_id):
-    return render_template('library.html', user_id=user_id)
+    try:
+        user = User.objects(id=user_id).first()
+        if not user:
+            raise ValidationError(f'User with id {user_id} does not exist')
+        return render_template('library.html', user_id=user_id)
+    except ValidationError as e:
+        abort(404, e)
 
 @players.route('/user/<user_id>/trackers')
 def user_tracks(user_id):
