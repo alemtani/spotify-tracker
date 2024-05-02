@@ -40,7 +40,7 @@ def player_detail(player_id):
         tracker = Tracker.objects(spotify_id=player_id, user=current_user).first() if current_user.is_authenticated else None
         user_review = Review.objects(spotify_id=player_id, user=current_user).first() if current_user.is_authenticated else None
         reviews = Review.objects(spotify_id=player_id)
-        rating = reviews.average('rating')
+        rating = round(reviews.average('rating'), 1)
 
         # Sort reviews
         reviews = list(reviews)

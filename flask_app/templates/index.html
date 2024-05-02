@@ -8,27 +8,31 @@
 <div class="mb-3">
     <input id="q" type="search" class="form-control" aria-label="Search" placeholder="Search">
 </div>
-<div class="form-check form-check-inline">
-    <input class="form-check-input" type="radio" name="item" id="album" value="album" checked>
-    <label class="form-check-label" for="album">Album</label>
-</div>
-<div class="form-check form-check-inline">
-    <input class="form-check-input" type="radio" name="item" id="track" value="track">
-    <label class="form-check-label" for="track">Track</label>
+
+<div class="mb-3">
+    <div class="form-check form-check-inline">
+        <input class="form-check-input" type="radio" name="item" id="album" value="album" checked>
+        <label class="form-check-label" for="album">Album</label>
+    </div>
+    <div class="form-check form-check-inline">
+        <input class="form-check-input" type="radio" name="item" id="track" value="track">
+        <label class="form-check-label" for="track">Track</label>
+    </div>
 </div>
 
-<div class="mt-3 py-5">
+<div class="py-3">
     <div class="container">
         <div class="album row row-cols-1 row-cols-sm-2 row-cols-md-4 g-3" id="album-list">
         </div>
         <div class="list-group mb-3" id="track-list">
         </div>
     </div>
-    <div class="spinner-border invisible" id="spinner" role="status">
+    <div class="spinner-border d-none mb-3" id="spinner" role="status">
         <span class="visually-hidden">Loading...</span>
     </div>
-    <button type="button" class="btn btn-primary invisible" id="loader">Load More...</button>
 </div>
+
+<button type="button" class="btn btn-primary d-none mb-3" id="loader">Load More...</button>
 
 {% endblock %}
 

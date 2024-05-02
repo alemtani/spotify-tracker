@@ -3,14 +3,14 @@ let counter = 0;
 function processResultsSearch(results) {
     processResults(results);
     if (results.data.length === 0) return;
-    $('#loader').removeClass('invisible');
+    $('#loader').removeClass('d-none');
     counter += results.data.length;
 }
 
 function getResults() {
     counter = 0; // reset counter
     clearResults();
-    if (!$('#loader').hasClass('invisible')) $('#loader').addClass('invisible');
+    if (!$('#loader').hasClass('d-none')) $('#loader').addClass('d-none');
     $.getJSON($SCRIPT_ROOT + '/search', {
         q: $('#q').val(),
         item: $('input[name="item"]:checked').val()
@@ -18,8 +18,8 @@ function getResults() {
 }
 
 function loadMoreResults() {
-    $('#spinner').removeClass('invisible');
-    $('#loader').addClass('invisible');
+    $('#spinner').removeClass('d-none');
+    $('#loader').addClass('d-none');
     $.getJSON($SCRIPT_ROOT + '/search', {
         q: $('#q').val(),
         item: $('input[name="item"]:checked').val(),

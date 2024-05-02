@@ -34,7 +34,7 @@ function addTrack(result) {
 }
 
 function processResults(results) {
-    $('#spinner').addClass('invisible');
+    $('#spinner').addClass('d-none');
     if (results.data.length === 0) return;
     results.data.forEach(function(result) {
         if (results['type'] == 'album') {
@@ -48,5 +48,5 @@ function processResults(results) {
 function clearResults() {
     $('#album-list').empty();
     $('#track-list').empty();
-    $('#spinner').removeClass('invisible');
+    $('#spinner').removeClass('d-none');
 }
