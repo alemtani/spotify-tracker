@@ -15,7 +15,7 @@ https://spotify-tracker-eta.vercel.app/
 
 ## Configure Environment
 
-Create a `.env` file with the following keys.
+Create a `.env` file in the project directory with the following keys.
 
 `SECRET_KEY`
 
