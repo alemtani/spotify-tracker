@@ -1,19 +1,47 @@
 # Spotify Tracker
 
-## Description
+This application is a lite version of what an IMDb for Spotify would look like.
 
-This application tries to replicate the features of IMDB for Spotify. Specifically, it has two core functionalities inspired by IMDB.
-1. It allows users to track tracks and albums in their library, updating the listening status and number of tracks listened to in the album.
-2. It allows users to rate and review tracks and albums, and update them too.
+## Deployment
+
+https://spotify-tracker-eta.vercel.app/
 
 ## Technologies
 
 - Flask
 - MongoDB
-- HTML/CSS/JavaScript
+- Vercel
 - Spotify Web API
 
-## Setup
+## Configure Environment
+
+Create a `.env` file with the following keys.
+
+`SECRET_KEY`
+
+Generate a secret key by copying the output of this command.
+
+```
+python3 -c 'import secrets; print(secrets.token_hex())'
+```
+
+`MONGODB_HOST`
+
+This is your connection string to the MongoDB Atlas cluster. For instructions on how to get it, see [here](https://www.mongodb.com/docs/guides/atlas/connection-string/). An example string looks like this:
+
+```
+mongodb+srv://<mongodbuser>:<password>@cluster0.gy12rxn.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
+```
+
+`CLIENT_ID`
+
+This is the Spotify Client ID you get when you create an app by following the instructions [here](https://developer.spotify.com/documentation/web-api/tutorials/getting-started).
+
+`CLIENT_SECRET`
+
+Follow the instructions linked above, just like for `CLIENT_ID`.
+
+## Running Locally
 
 Make sure Python 3 is installed on your computer, and make sure you are in your project directory.
 
@@ -41,6 +69,6 @@ And now you can start!
 flask run
 ```
 
-## Contributing
+## Writeup
 
-Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
+This project was completed as coursework for **CMSC388J: Building Secure Web Applications** at the University of Maryland. Please find the writeup for the project [here](WRITEUP.md).
