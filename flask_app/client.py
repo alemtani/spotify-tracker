@@ -88,11 +88,13 @@ class Player(object):
         return ','.join(list(map(lambda genre: genre.capitalize(), self.genres)))
 
 class SpotifyClient(object):
-    def __init__(self, client_id, client_secret):
+    def __init__(self):
         self.sess = requests.Session()
-        self.client_id = client_id
-        self.client_secret = client_secret
         self.expires_in = time.time()
+    
+    def init_app(self, app):
+        self.client_id = app.config['CLIENT_ID']
+        self.client_secret = app.config['CLIENT_SECRET']
     
     def refresh_token(self):
         now = time.time()

@@ -4,13 +4,13 @@ from flask_bcrypt import Bcrypt
 from flask_login import LoginManager
 from flask_mongoengine import MongoEngine
 
+import base64
+import os
+
 # Create a new Spotify client
 from .client import SpotifyClient
 
-CLIENT_ID = '7dc4ccd94bfc45c7946f8d937867df4b'
-CLIENT_SECRET = '061d96a2988f4726a2f84ee62690854c'
-
-spotify_client = SpotifyClient(CLIENT_ID, CLIENT_SECRET)
+spotify_client = SpotifyClient()
 
 bcrypt = Bcrypt()
 bootstrap = Bootstrap5()
@@ -27,10 +27,16 @@ def custom_404(e):
 def create_app(test_config=None):
     app = Flask(__name__)
 
-    app.config.from_pyfile('config.py', silent=False)
+    # Load environment variables into config
+    app.config['SECRET_KEY'] = base64.b64decode(os.environ.get('SECRET_KEY', 'default_secret_key'))
+    app.config['MONGODB_HOST'] = os.environ.get('MONGODB_HOST', 'default_mongodb_host')
+    app.config['CLIENT_ID'] = os.environ.get('CLIENT_ID', 'default_client_id')
+    app.config['CLIENT_SECRET'] = os.environ.get('CLIENT_SECRET', 'default_client_secret')
+
     if test_config is not None:
         app.config.update(test_config)
     
+    spotify_client.init_app(app)
     bootstrap.init_app(app)
     login_manager.init_app(app)
     db.init_app(app)
